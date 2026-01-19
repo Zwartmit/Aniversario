@@ -83,6 +83,25 @@ body {
   animation: fadeInUp 1s ease 1.5s both, blink 2s ease-in-out 3s infinite;
 }
 
+.arrow-up {
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: -10px 0 -5px 0;
+  animation: fadeInUp 1s ease 1.3s both, bounce 2s ease-in-out 3s infinite;
+}
+
+@keyframes bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
 @keyframes blink {
 
   0%,
