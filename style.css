@@ -60,12 +60,14 @@ body {
 }
 
 .loader-btn {
-  padding: 20px;
+  padding: 30px;
   background: transparent;
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
   animation: pulse 2s ease-in-out 1s infinite;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .loader-btn:hover {
@@ -74,6 +76,10 @@ body {
 
 .loader-btn:hover .infinite-svg {
   filter: drop-shadow(0 0 20px rgba(255, 77, 128, 0.8));
+}
+
+.infinite-svg {
+  pointer-events: none;
 }
 
 .click-hint {
