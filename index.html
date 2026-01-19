@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Nuestro primer aniversario</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
+    rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+</head>
+
+<body>
+
+  <!-- LOADING SCREEN -->
+  <div id="loader-overlay">
+    <div class="loader-content">
+      <p class="loader-message">
+        Acompáñame a celebrar nuestro aniversario...
+      </p>
+      <button class="loader-btn">
+        <svg class="infinite-svg" viewBox="0 0 100 50">
+          <path class="infinite-path"
+            d="M20,25 C20,10 40,10 50,25 C60,40 80,40 80,25 C80,10 60,10 50,25 C40,40 20,40 20,25 z" />
+        </svg>
+      </button>
+      <p class="click-hint">Haz clic para comenzar</p>
+    </div>
+  </div>
+
+  <!-- 3D Background Container -->
+  <div id="canvas-container"></div>
+
+  <!-- Background Music -->
+  <audio id="bg-music" loop muted>
+    <source src="assets/Between Us.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Music Control Button -->
+  <button id="music-toggle" class="music-btn">
+    <span class="music-icon">🎵</span>
+  </button>
+
+  <!-- INTRO -->
+  <section id="intro">
+    <h1>Hace un año empezó algo increíble...</h1>
+    <div id="hero-date-counter" class="date-counter-anim">20/01/2025</div>
+
+    <!-- Final Reveal (Hidden initially) -->
+    <div id="final-reveal">
+      <div class="final-text">¡Vamos a recordar!</div>
+      <div class="heart-wrapper">
+        <div class="burning-heart">❤️‍🔥</div>
+      </div>
+      <div class="scroll-indicator">
+        <span>Desliza para continuar</span>
+        <div class="arrow-down"></div>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="scrollToSection('timeline')">
+      <span>Empezar el viaje</span>
+    </button>
+  </section>
+
+  <!-- TIMELINE -->
+  <section id="timeline">
+    <div class="timeline">
+
+      <div class="event" onclick="toggleEvent(this)">
+        <div class="card-glass event-card">
+          <div class="event-title">👀 Primeros acercamientos...</div>
+          <div class="event-content">
+            Miraditas, saludos desde lejitos... Y ese día del "Hola, ¿Cómo estás?"
+            <br>
+            Mientras tanto tú:
+            <div style="display: flex; justify-content: space-between">
+              <img src="assets/empanada1.jpg" style="width: 50%; padding: 1rem">
+              <img src="assets/empanada2.jpg" style="width: 50%; padding: 1rem">
+            </div>
+            Y así, día a día, el SENA fue testigo de ese romance que se acercaba...
+          </div>
+        </div>
+      </div>
+
+      <div class="event" onclick="toggleEvent(this)">
+        <div class="card-glass event-card">
+          <div class="event-title">📲 El primer mensaje...</div>
+          <div class="event-content">
+            Luego de hacer una pequeña gestión, logré obtener tu instagram. Y cuando subiste esa foto en la
+            que te veías divina (como en todas) no dudé en escribirte. En arriesgarme y ver qué pasaba:
+            <img src="assets/mensaje1.jpg" style="width: 100%; margin: 1rem;">
+            <div style="text-align: center; font-size: 0.8rem; color: #fff;">(Parla pura, jajsjs)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="event" onclick="toggleEvent(this)">
+        <div class="card-glass event-card">
+          <div class="event-title">🥂 La primera cita...</div>
+          <div class="event-content">
+            No tenemos fotos de ese día, solo vivimos el momento entre risas y nervios, hablamos sin parar y
+            disfrutamos del estar juntos, la anécdota de ese 31 de octubre es inolvidable. Era nuestra primera cita...
+            <img src="assets/acostados.png" style="width: 100%; margin: 1rem;">
+            <div style="text-align: center; font-size: 0.8rem; color: #fff;">Esa noche no dormimos así (pero casi,
+              jajsjs)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="event" onclick="toggleEvent(this)">
+        <div class="card-glass event-card">
+          <div class="event-title">⌛ Aquellos días...</div>
+          <div class="event-content">
+            Seguimos compartiendo momentos, intercambiando mensajes, fotos, videos y, poco a poco, íbamos
+            conociéndonos más. Interesandonos el uno por el otro, conociendo nuestros gustos, nuestras
+            personalidades, nuestras manías, nuestras virtudes y nuestros defectos.
+            <br>
+            <div style="display: flex; justify-content: center">
+              <video src="assets/video.mp4" style="width: 30%; margin: 1rem;" autoplay loop muted></video>
+              <video src="assets/video.mp4" style="width: 30%; margin: 1rem; transform: rotateY(180deg);" autoplay loop
+                muted></video>
+            </div>
+            <div style="text-align: center; font-size: 0.8rem; color: #fff;">(Estos somos nosotros hablando)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="event" onclick="toggleEvent(this)">
+        <div class="card-glass event-card">
+          <div class="event-title">❤️‍🔥 El día...</div>
+          <div class="event-content">
+            Aquél maravilloso 20 de enero de 2025 fue el día en que decidimos formalizar nuestro amor...
+            <img src="assets/20.jpg" style="width: 100%; margin: 1rem;">
+            <div style="text-align: center; font-size: 0.8rem; color: #fff;">(Si mal no recuerdo, esta foto fue ese día)
+            </div>
+            <br>
+            Y desde aquel entonces, iniciamos un año lleno de muchas aventuras, vivencias, risas, llantos... millones de
+            recuerdos y emociones que
+            hoy atesoro en lo más profundo de mi corazón.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery">
+    <h1>He aquí algunas de mis fotos favoritas...</h1>
+    <div class="gallery">
+      <div class="card-glass photo-card">
+        <div class="placeholder-img">
+          <img src="assets/fotos/1737937691067.jpg" alt="Recuerdo"
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+      <div class="card-glass photo-card">
+        <div class="placeholder-img">
+          <img src="assets/fotos/IMG_20251213_184443.jpg" alt="Recuerdo"
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+      <div class="card-glass photo-card">
+        <div class="placeholder-img">
+          <img src="assets/fotos/1741696347687.jpg" alt="Recuerdo"
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+      <div class="card-glass photo-card">
+        <div class="placeholder-img">
+          <img src="assets/fotos/IMG_20251022_152744.jpg" alt="Recuerdo"
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+      <div class="card-glass photo-card">
+        <div class="placeholder-img">
+          <img src="assets/fotos/e318c8de5cdb4996918fed348dbefb95.jpg" alt="Recuerdo"
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+      <div class="card-glass photo-card">
+        <div class="placeholder-img">
+          <img src="assets/fotos/1734052261338.jpg" alt="Recuerdo"
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+      <div class="card-glass photo-card">
+        <div class="placeholder-img">
+          <img src="assets/fotos/IMG_20260104_151836.jpg" alt="Recuerdo"
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+      <div class="card-glass photo-card">
+        <div class="placeholder-img">
+          <img src="assets/fotos/1737334337583.jpg" alt="Recuerdo"
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+      <div class="card-glass photo-card">
+        <div class="placeholder-img">
+          <img src="assets/fotos/IMG_20241202_214446.jpg" alt="Recuerdo"
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+      <div class="card-glass photo-card">
+        <div class="placeholder-img">
+          <img src="assets/fotos/IMG_20251228_175617.jpg" alt="Recuerdo"
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+      <div class="card-glass photo-card">
+        <div class="placeholder-img">
+          <img src="assets/fotos/1739163421582.jpg" alt="Recuerdo"
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+      <div class="card-glass photo-card">
+        <div class="placeholder-img">
+          <img src="assets/fotos/IMG_20250802_211315.jpg" alt="Recuerdo"
+            style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- FINAL -->
+  <section>
+    <h1>
+      ¡Gracias por tanto amor!
+      <br>
+      Sigamos escribiendo esta historia juntos...
+    </h1>
+    <div class="heart-wrapper">
+      <div class="burning-heart">❤️‍🔥</div>
+    </div>
+    <br>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
