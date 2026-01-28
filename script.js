@@ -1,3 +1,82 @@
+// --- Template Initialization ---
+const initTemplate = () => {
+  // 1. Page Title
+  document.title = config.pageTitle;
+
+  // 2. Loading Screen
+  document.getElementById('loading-hint').textContent = config.loading.clickHint;
+  document.getElementById('loading-msg').textContent = config.loading.message;
+
+  // 3. Hero Section
+  document.getElementById('hero-title').textContent = config.hero.title;
+  document.getElementById('hero-final-text').textContent = config.hero.finalText;
+  document.getElementById('scroll-text').textContent = config.hero.scrollText;
+  document.querySelector('.btn-primary span').textContent = config.hero.buttonText;
+  document.querySelector('.burning-heart').textContent = config.hero.heartCharacter || '❤️‍🔥';
+
+  // 4. Timeline Generation
+  const timelineContainer = document.getElementById('timeline-container');
+  config.timeline.forEach((event, index) => {
+    const eventDiv = document.createElement('div');
+    eventDiv.className = 'event';
+    eventDiv.onclick = function () { toggleEvent(this); };
+
+    // Media Logic (Images or Videos)
+    let mediaHtml = '';
+    if (event.images && event.images.length > 0) {
+      mediaHtml += '<div style="display: flex; justify-content: space-between; gap: 10px; margin: 1rem 0;">';
+      event.images.forEach(img => {
+        mediaHtml += `<img src="${img}" style="width: ${event.images.length > 1 ? '48%' : '100%'}; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">`;
+      });
+      mediaHtml += '</div>';
+    }
+
+    if (event.videos && event.videos.length > 0) {
+      mediaHtml += '<div style="display: flex; justify-content: center; gap: 10px; margin: 1rem 0;">';
+      event.videos.forEach(vid => {
+        mediaHtml += `<video src="${vid}" style="width: ${event.videos.length > 1 ? '45%' : '90%'}; border-radius: 8px;" autoplay loop muted playsinline></video>`;
+      });
+      mediaHtml += '</div>';
+    }
+
+    eventDiv.innerHTML = `
+      <div class="card-glass event-card">
+        <div class="event-title">${event.title}</div>
+        <div class="event-content">
+          ${event.content}
+          ${mediaHtml}
+          ${event.footer ? `<div style="text-align: center; font-size: 0.9rem; opacity: 0.8; margin-top: 10px;">${event.footer}</div>` : ''}
+          ${event.extra || ''}
+        </div>
+      </div>
+    `;
+    timelineContainer.appendChild(eventDiv);
+  });
+
+  // 5. Gallery Generation
+  const galleryContainer = document.getElementById('gallery-container');
+  document.getElementById('gallery-title').textContent = config.gallery.title;
+
+  config.gallery.images.forEach(imgSrc => {
+    const photoCard = document.createElement('div');
+    photoCard.className = 'card-glass photo-card';
+    photoCard.innerHTML = `
+      <div class="placeholder-img">
+        <img src="${imgSrc}" alt="Recuerdo" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+    `;
+    galleryContainer.appendChild(photoCard);
+  });
+
+  // 6. Final Message
+  document.getElementById('final-message').innerHTML = config.finalMessage.content;
+
+  // 7. Music Source
+  const bgMusic = document.getElementById('bg-music');
+  bgMusic.src = config.music.path;
+  bgMusic.volume = config.music.volume;
+};
+
 // --- Three.js Background Animation ---
 const initThreeJS = () => {
   const container = document.getElementById('canvas-container');
@@ -45,7 +124,6 @@ const initThreeJS = () => {
     positions[i3 + 1] = randomY;
     positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
 
-    // Use clone to avoid mutating the original color object repeatedly in a weird way (though not strictly necessary if lerp returns self, safety first)
     const mixedColor = colorInside.clone();
     mixedColor.lerp(colorOutside, radius / parameters.radius);
 
@@ -68,20 +146,16 @@ const initThreeJS = () => {
   const points = new THREE.Points(geometry, material);
   scene.add(points);
 
-  // Initial rotation
   points.rotation.x = 0.5;
 
-  // Animation Loop
   const animate = () => {
-    points.rotation.y += 0.001; // Slow rotation
-
+    points.rotation.y += 0.001;
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
   };
 
   animate();
 
-  // Resize Handle
   window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -94,9 +168,7 @@ const initThreeJS = () => {
 const initAnimations = () => {
   gsap.registerPlugin(ScrollTrigger);
 
-  // Note: Hero text animation is set to manual typewriter now, so we remove the original H1 tween
   const heroTl = gsap.timeline();
-  // Animate button only, wait for date logic to show text
   heroTl.from('.btn-primary', { scale: 0.8, opacity: 0, duration: 0.8, ease: 'back.out(1.7)', delay: 2 });
 
   // Timeline Events
@@ -124,59 +196,36 @@ const initAnimations = () => {
       y: 100,
       opacity: 0,
       duration: 1,
-      delay: i * 0.2, // Stagger effect
+      delay: (i % 4) * 0.1, // Adjusted stagger for better performance
       ease: 'power4.out'
     });
-  });
-
-  // Letters
-  gsap.from('.letter-card', {
-    scrollTrigger: {
-      trigger: '.letters-grid',
-      start: 'top 80%'
-    },
-    y: 50,
-    opacity: 0,
-    stagger: 0.2,
-    duration: 1,
-    ease: 'power2.out'
   });
 };
 
 // --- UI Logic ---
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize Template Data FIRST
+  initTemplate();
+
+  // Then start animations
   initThreeJS();
   initAnimations();
 
-  // Smooth Scroll to Timeline
   window.scrollToSection = (id) => {
     document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Toggle Event Details (Accordion behavior)
   window.toggleEvent = (element) => {
-    // Close all other events first
     document.querySelectorAll('.event').forEach(event => {
       if (event !== element) {
         event.classList.remove('active');
       }
     });
-
-    // Toggle the clicked event
     element.classList.toggle('active');
-  };
-
-  // Toggle Letter
-  window.toggleLetter = (element) => {
-    // Close others
-    document.querySelectorAll('.letter-card').forEach(card => {
-      if (card !== element) card.classList.remove('open');
-    });
-    element.classList.toggle('open');
   };
 });
 
-// Typewriter Effect for H1
+// Typewriter Effect
 const typeText = (element, text, speed = 75, callback) => {
   element.textContent = "";
   element.style.opacity = 1;
@@ -196,59 +245,57 @@ const typeText = (element, text, speed = 75, callback) => {
 // Date Counter Animation
 const animateDateCounter = () => {
   const el = document.getElementById('hero-date-counter');
-  const h1 = document.querySelector('h1');
-  const titleText = "Hace un año empezó algo increíble...";
+  const h1 = document.getElementById('hero-title'); // Changed selector
 
-  if (!el) return;
+  if (!el || !h1) return;
 
-  // 1. Typewriter Start
-  // Reduced speed to 75ms (faster than 100ms)
-  typeText(h1, titleText, 75, () => {
+  // Use config logic
+  const startDateStr = config.hero.startDate; // YYYY-MM-DD
+  const startYear = parseInt(startDateStr.split('-')[0]);
+  const startMonth = parseInt(startDateStr.split('-')[1]) - 1; // 0-indexed
+  const startDay = parseInt(startDateStr.split('-')[2]);
 
-    // START DATE ANIMATION ONLY AFTER H1 FINISHES
+  // Logic: Count 1 year from start date
+  const startDate = new Date(startYear, startMonth, startDay).getTime();
+  const endDate = new Date(startYear + 1, startMonth, startDay).getTime();
 
-    // Initial State visible
-    el.innerText = '20/01/2025';
+  // Format MM/DD/YYYY for display initially? Or DD/MM/YYYY?
+  // Let's stick to DD/MM/YYYY
+  const formatDate = (date) => {
+    const d = String(date.getDate()).padStart(2, '0');
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const y = date.getFullYear();
+    return `${d}/${m}/${y}`;
+  };
 
-    // Fade in date
+  typeText(h1, config.hero.title, 60, () => {
+    // Initial State
+    el.innerText = formatDate(new Date(startDate));
+
     gsap.to(el, { opacity: 1, y: 0, duration: 1, ease: 'power2.out' });
 
-    // Use (Year, MonthIndex, Day) to ensure Local Time
-    const startDate = new Date(2025, 0, 20).getTime(); // Jan is 0
-    const endDate = new Date(2026, 0, 20).getTime();
-    const duration = 2000; // 2 seconds
+    const duration = 2000;
     let startTime = null;
 
     const update = (currentTime) => {
       if (!startTime) startTime = currentTime;
       const elapsed = currentTime - startTime;
       let progress = Math.min(elapsed / duration, 1);
-
-      // Ease In (Starts slow, ends fast) -> t^3
       const easedProgress = Math.pow(progress, 3);
 
       const currentMap = startDate + (endDate - startDate) * easedProgress;
       const dateObj = new Date(currentMap);
 
-      // Format DD/MM/YYYY
-      const d = String(dateObj.getDate()).padStart(2, '0');
-      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const y = dateObj.getFullYear();
-
-      el.innerText = `${d}/${m}/${y}`;
+      el.innerText = formatDate(dateObj);
 
       if (progress < 1) {
         requestAnimationFrame(update);
       } else {
-        // 2. Final Value Reached
-        el.innerText = '20/01/2026';
-
-        // 3. Zoom Animation & Reveal
+        el.innerText = formatDate(new Date(endDate));
         triggerFinalReveal(el);
       }
     };
 
-    // Wait a small moment (500ms) after title finishes before showing date
     setTimeout(() => {
       requestAnimationFrame(update);
     }, 500);
@@ -257,42 +304,34 @@ const animateDateCounter = () => {
 
 // Final Reveal Logic
 const triggerFinalReveal = (dateElement) => {
-  // DATE ZOOM EFFECT
   gsap.to(dateElement, {
-    scale: 10,        // Zoom in massive
-    opacity: 0,       // Fade out
+    scale: 10,
+    opacity: 0,
     duration: 1.5,
     ease: "power2.in",
     onComplete: () => {
-      // 1. Capture H1 Position (First)
       const h1 = document.querySelector('h1');
       const startY = h1.getBoundingClientRect().top;
 
-      // 2. Change Layout
-      dateElement.style.display = 'none'; // Remove date
+      dateElement.style.display = 'none';
       const revealContainer = document.getElementById('final-reveal');
 
       if (revealContainer) {
-        revealContainer.style.display = 'flex'; // Show final content
-
-        // 3. Capture H1 Position (Last) & Calculate Delta
+        revealContainer.style.display = 'flex';
         const endY = h1.getBoundingClientRect().top;
         const deltaY = startY - endY;
 
-        // 4. Animate H1 (Smooth Slide Up)
         gsap.fromTo(h1,
-          { y: deltaY }, // Start from visual original position
-          { y: 0, duration: 1.5, ease: "power3.inOut" } // Move to new position smoothly
+          { y: deltaY },
+          { y: 0, duration: 1.5, ease: "power3.inOut" }
         );
 
-        // 5. Animate Reveal Container (Fade In)
         gsap.to(revealContainer, {
           opacity: 1,
           duration: 1.5,
-          delay: 0.3, // Slight delay to sync with H1 movement
+          delay: 0.3,
           ease: "power2.out",
           onComplete: () => {
-            // Enable Scroll Interaction for Heart
             setupHeartScrollEffect();
           }
         });
@@ -302,7 +341,6 @@ const triggerFinalReveal = (dateElement) => {
 };
 
 const setupHeartScrollEffect = () => {
-  // Heart Zoom Effect (only for intro heart)
   gsap.to('#intro .heart-wrapper', {
     scrollTrigger: {
       trigger: '#intro',
@@ -310,12 +348,10 @@ const setupHeartScrollEffect = () => {
       end: 'bottom top',
       scrub: true,
       onEnter: () => {
-        // Stop pulsating when scrolling starts to avoid conflict
         const introHeart = document.querySelector('#intro .burning-heart');
         if (introHeart) introHeart.style.animation = 'none';
       },
       onLeaveBack: () => {
-        // Restore pulsating when back at top
         const introHeart = document.querySelector('#intro .burning-heart');
         if (introHeart) introHeart.style.animation = 'burnPulse 1.5s infinite alternate';
       }
@@ -326,12 +362,11 @@ const setupHeartScrollEffect = () => {
     ease: "power1.in"
   });
 
-  // Hide Scroll Indicator on Scroll
   gsap.to('.scroll-indicator', {
     scrollTrigger: {
       trigger: '#intro',
       start: 'top top',
-      end: '10% top',   // Disappear quickly
+      end: '10% top',
       scrub: true
     },
     opacity: 0,
@@ -339,13 +374,13 @@ const setupHeartScrollEffect = () => {
   });
 };
 
-// Force scroll to top on page load/refresh
+// Force scroll to top
 if ('scrollRestoration' in history) {
   history.scrollRestoration = 'manual';
 }
 window.scrollTo(0, 0);
 
-// Loading Screen Logic
+// Interaction Logic
 window.addEventListener('load', () => {
   const loader = document.getElementById('loader-overlay');
   const loaderBtn = document.querySelector('.loader-btn');
@@ -353,37 +388,40 @@ window.addEventListener('load', () => {
   const musicToggle = document.getElementById('music-toggle');
   let isPlaying = false;
 
-  // Click to start experience
-  if (loaderBtn && bgMusic) {
-    loaderBtn.addEventListener('click', () => {
-      // Start music
-      bgMusic.muted = false;
-      bgMusic.volume = 0.3;
-      bgMusic.play().then(() => {
-        isPlaying = true;
-        if (musicToggle) {
-          musicToggle.classList.add('playing');
-          musicToggle.querySelector('.music-icon').textContent = '🔊';
-        }
-      }).catch(err => {
-        console.log('Error playing music:', err);
-      });
-
-      // Fade out loader
-      setTimeout(() => {
-        loader.style.opacity = '0';
-        loader.style.visibility = 'hidden';
-
-        // Refresh ScrollTrigger and start animations
-        setTimeout(() => {
-          ScrollTrigger.refresh();
-          animateDateCounter();
-        }, 500);
-      }, 800);
+  const startExperience = () => {
+    // Start music
+    bgMusic.muted = false;
+    bgMusic.volume = config.music.volume;
+    bgMusic.play().then(() => {
+      isPlaying = true;
+      if (musicToggle) {
+        musicToggle.classList.add('playing');
+        musicToggle.querySelector('.music-icon').textContent = '🔊';
+      }
+    }).catch(err => {
+      console.log('Error playing music:', err);
     });
+
+    // Fade out loader
+    setTimeout(() => {
+      loader.style.opacity = '0';
+      loader.style.visibility = 'hidden';
+
+      setTimeout(() => {
+        ScrollTrigger.refresh();
+        animateDateCounter();
+      }, 500);
+    }, 800);
+  };
+
+  if (loaderBtn) {
+    loaderBtn.addEventListener('click', startExperience);
+    // Also allow clicking the hint
+    const hint = document.querySelector('.click-hint');
+    if (hint) hint.addEventListener('click', startExperience);
   }
 
-  // Music toggle functionality
+  // Music toggle
   if (musicToggle && bgMusic) {
     musicToggle.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -394,7 +432,7 @@ window.addEventListener('load', () => {
         isPlaying = false;
       } else {
         bgMusic.muted = false;
-        bgMusic.volume = 0.3;
+        bgMusic.volume = config.music.volume;
         bgMusic.play().then(() => {
           musicToggle.classList.add('playing');
           musicToggle.querySelector('.music-icon').textContent = '🔊';
@@ -406,3 +444,4 @@ window.addEventListener('load', () => {
     });
   }
 });
+
